@@ -4,6 +4,7 @@ import { Html5QrcodeScanner } from "html5-qrcode";
 import { namoid } from "./namoid";
 import userRoles from "./roles";
 import "./App.css";
+const API_URL = import.meta.env.VITE_API_URL;
 
 function App() {
   const [scannedCode, setScannedCode] = useState("");
@@ -204,7 +205,7 @@ useEffect(() => {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/api/passes", {
+      const response = await fetch(`${API_URL}/api/passes`, ... {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -242,9 +243,7 @@ useEffect(() => {
     event.preventDefault();
 
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/passes/verify/${verificationCode}`
-      );
+      const response = await fetch(`${API_URL}/api/passes/verify/${verificationCode}`);
 
       const data = await response.json();
 
@@ -261,8 +260,7 @@ useEffect(() => {
 
   const handleCompleteHandoff = async () => {
   try {
-    const response = await fetch(
-      `http://localhost:5000/api/passes/complete/${verificationCode}`,
+    const response = await fetch(`${API_URL}/api/passes/complete/${verificationCode}`,
       {
         method: "PATCH"
       }
@@ -295,8 +293,7 @@ useEffect(() => {
 
 const handleCancelPass = async () => {
   try {
-    const response = await fetch(
-      `http://localhost:5000/api/passes/cancel/${createdPass.code}`,
+    const response = await fetch(`${API_URL}/api/passes/cancel/${createdPass.code}`,
       {
         method: "PATCH"
       }
