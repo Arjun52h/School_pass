@@ -198,47 +198,47 @@ useEffect(() => {
   }
 };
   // Create pickup pass
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+ const handleSubmit = async (event) => {
+  event.preventDefault();
 
-    if (!namoidUser) {
-      alert("Please sign in with NamoID first.");
-      return;
-    }
+  if (!namoidUser) {
+    alert("Please sign in with NamoID first.");
+    return;
+  }
 
-    try {
-      const response = await fetch(`${API_URL}/api/passes`, ... {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            ...formData,
-            userSub: namoidUser.sub
-          })
+  try {
+    const response = await fetch(`${API_URL}/api/passes`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        ...formData,
+        userSub: namoidUser.sub
+      })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      setCreatedPass(data.pass);
+      setMessage("Pickup pass created successfully!");
+
+      setFormData({
+        childName: "",
+        authorizedPerson: "",
+        date: "",
+        startTime: "",
+        endTime: ""
       });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setCreatedPass(data.pass);
-        setMessage("Pickup pass created successfully!");
-
-        setFormData({
-          childName: "",
-          authorizedPerson: "",
-          date: "",
-          startTime: "",
-          endTime: ""
-        });
-      } else {
-        setMessage("Failed to create pass.");
-      }
-    } catch (error) {
-      console.error(error);
-      setMessage("Cannot connect to backend.");
+    } else {
+      setMessage("Failed to create pass.");
     }
-  };
+  } catch (error) {
+    console.error(error);
+    setMessage("Cannot connect to backend.");
+  }
+};
 
   // Verify pickup pass
   const handleVerify = async (event) => {
