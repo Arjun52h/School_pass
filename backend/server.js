@@ -11,14 +11,24 @@ app.use(express.json());
 
 app.use("/api/passes" , pickuppassroute);
 
-mongoose.connect(process.env.MONGO_URI)
+// mongoose.connect(process.env.MONGO_URI)
+//     .then(() => {
+//         console.log("MongoDB connected Successfully");
+//     })
+//     .catch((error) => {
+//         console.log("MongoDB connection Failed:",error);
+        
+//     })
+
+if (process.env.NODE_ENV !== "test") {
+  mongoose.connect(process.env.MONGO_URI)
     .then(() => {
-        console.log("MongoDB connected Successfully");
+      console.log("MongoDB connected Successfully");
     })
     .catch((error) => {
-        console.log("MongoDB connection Failed:",error);
-        
-    })
+      console.log("MongoDB connection Failed:", error);
+    });
+}
 
 app.get("/" , (req,res)=>{
     res.json({
@@ -28,8 +38,10 @@ app.get("/" , (req,res)=>{
 
 const PORT = 5000;
 
-
-app.listen(PORT, () =>{
+if (require.main === module) {
+  app.listen(PORT, () => {
     console.log(`Server is Running on Port http://localhost:${PORT}`);
-    
-});
+  });
+}
+
+module.exports = app;
