@@ -96,23 +96,25 @@ useEffect(() => {
     });
   };
 
-  const handleLogin = async () => {
+ const handleLogin = async () => {
   try {
-      const started = await namoid.hostedAuth.start({
-        redirectUri: "http://localhost:5173/auth/callback",
-      });
+    const redirectUri = `${window.location.origin}/auth/callback`;
 
-      sessionStorage.setItem(
-        "namoid_transaction",
-        JSON.stringify(started.transaction)
-      );
+    const started = await namoid.hostedAuth.start({
+      redirectUri,
+    });
 
-      window.location.assign(started.authorizationUrl);
-    } catch (error) {
-      console.error("NamoID login failed:", error);
-      alert("Unable to start NamoID login.");
-    }
-  };
+    sessionStorage.setItem(
+      "namoid_transaction",
+      JSON.stringify(started.transaction)
+    );
+
+    window.location.assign(started.authorizationUrl);
+  } catch (error) {
+    console.error("NamoID login failed:", error);
+    alert("Unable to start NamoID login.");
+  }
+};
  const handleNamoIDCallback = async () => {
   try {
     const callback = new URL(window.location.href);
