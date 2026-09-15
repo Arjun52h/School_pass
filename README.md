@@ -1,3 +1,12 @@
+## Demo Test Accounts
+
+This project uses NamoID Test Users for demonstration.
+for now guardian and staff uses same credentials 
+and for the password otp is required .
+
+
+These accounts are fictional NamoID test users created specifically for this community build.
+
 # School Pickup Pass
 
 **[Powered by NamoID](https://namoid.in)** ·
