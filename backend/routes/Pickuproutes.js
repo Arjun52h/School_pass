@@ -89,37 +89,29 @@ router.get("/verify/:code", async (req, res) => {
     }
 
     // Create the pickup window
-    const startDateTime = new Date(
-      `${pickupPass.date}T${pickupPass.startTime}`
-    );
-
-    const endDateTime = new Date(
-      `${pickupPass.date}T${pickupPass.endTime}`
-    );
-
-    const now = new Date();
+const start = new Date(`${pickupPass.date}T${pickupPass.startTime}:00+05:30`);
+const end = new Date(`${pickupPass.date}T${pickupPass.endTime}:00+05:30`);
+const now = new Date();
 
     // Pickup window has not started
-    if (now < startDateTime) {
-      return res.json({
-        valid: false,
-        message: "Pickup window has not started yet",
-        pass: pickupPass
-      });
-    }
+    if (now < start) {
+  return res.status(400).json({
+    valid: false,
+    message: "Pickup window has not started yet",
+    pass : pickupPass
+  });
+}
 
-    // Pickup window has ended
-    if (now > endDateTime) {
-      pickupPass.status = "expired";
+if (now > end) {
+  pickupPass.status = "expired";
+  await pickupPass.save();
 
-      await pickupPass.save();
-
-      return res.json({
-        valid: false,
-        message: "This pickup pass has expired",
-        pass: pickupPass
-      });
-    }
+  return res.status(400).json({
+    valid: false,
+    message: "This pickup pass has expired",
+    pass:pickupPass
+  });
+}
 
     // Record successful verification
     pickupPass.events.push({

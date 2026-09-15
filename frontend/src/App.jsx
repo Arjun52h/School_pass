@@ -2,9 +2,10 @@ import { useState ,useEffect} from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { Html5QrcodeScanner } from "html5-qrcode";
 import { namoid } from "./namoid";
-import userRoles from "./roles";
+
 import "./App.css";
 const API_URL = import.meta.env.VITE_API_URL;
+console.log("API_URL =", API_URL);
 
 function App() {
   const [scannedCode, setScannedCode] = useState("");
@@ -68,9 +69,12 @@ function App() {
   return savedUser ? JSON.parse(savedUser) : null;
 });
 
-const userRole = namoidUser
-  ? userRoles[namoidUser.sub]
-  : null;
+const [userRole, setUserRole] = useState(() => {
+  return sessionStorage.getItem("user_role") || null;
+});
+
+const [showRoleSelection, setShowRoleSelection] = useState(false);
+const [staffCode, setStaffCode] = useState("");
   const [createdPass, setCreatedPass] = useState(null);
   const [message, setMessage] = useState("");
 
@@ -87,7 +91,11 @@ useEffect(() => {
   if (userRole === "staff") {
     setView("staff");
   }
-}, [userRole]);  
+
+  if (namoidUser && !userRole) {
+    setShowRoleSelection(true);
+  }
+}, [userRole, namoidUser]);  
 
   const handleChange = (event) => {
     setFormData({
@@ -95,6 +103,24 @@ useEffect(() => {
       [event.target.name]: event.target.value
     });
   };
+
+  const chooseGuardian = () => {
+  sessionStorage.setItem("user_role", "guardian");
+  setUserRole("guardian");
+  setShowRoleSelection(false);
+  setView("guardian");
+};
+const chooseStaff = () => {
+  if (staffCode !== "SCHOOL-STAFF-2026") {
+    alert("Invalid staff invite code.");
+    return;
+  }
+
+  sessionStorage.setItem("user_role", "staff");
+  setUserRole("staff");
+  setShowRoleSelection(false);
+  setView("staff");
+};
 
  const handleLogin = async () => {
   try {
@@ -180,6 +206,11 @@ useEffect(() => {
       "namoid_user",
       JSON.stringify(identity)
     );
+    const savedRole = sessionStorage.getItem("user_role");
+
+    if (!savedRole) {
+      setShowRoleSelection(true);
+    }
 
     // Transaction is no longer needed
     sessionStorage.removeItem("namoid_transaction");
@@ -352,18 +383,47 @@ useEffect(() => {
     <main className="container">
 
       {!namoidUser && (
-        <div className="card">
-          <h2>Welcome</h2>
+  <div className="card">
+    <h2>Welcome</h2>
 
-          <p>
-            Create and verify secure school pickup passes.
-          </p>
+    <p>
+      Create and verify secure school pickup passes.
+    </p>
 
-          <button onClick={handleLogin}>
-            Sign in with NamoID
-          </button>
-        </div>
-      )}
+    <button onClick={handleLogin}>
+      Sign in with NamoID
+    </button>
+  </div>
+)}
+
+{namoidUser && !userRole && showRoleSelection && (
+  <div className="card role-card">
+    <h2>Choose Your Role</h2>
+
+    <p>
+      Select how you will use School Pickup Pass.
+    </p>
+
+    <button onClick={chooseGuardian}>
+      👨‍👩‍👧 Continue as Guardian
+    </button>
+
+    <hr />
+
+    <h3>School Staff</h3>
+
+    <input
+      type="text"
+      placeholder="Enter staff invite code"
+      value={staffCode}
+      onChange={(e) => setStaffCode(e.target.value)}
+    />
+
+    <button onClick={chooseStaff}>
+      🏫 Continue as Staff
+    </button>
+  </div>
+)}
 
       {/* ================= GUARDIAN DASHBOARD ================= */}
 
